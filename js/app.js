@@ -394,14 +394,6 @@ async function init(){
     });
   }
 
-  // Theme toggle
-  const themeBtn = qs("#themeToggle");
-  if (themeBtn){
-    themeBtn.addEventListener("click", () => {
-      setTheme(state.theme === "light" ? "dark" : "light");
-    });
-  }
-
   // Copy email (exists only on index.html)
   const copyBtn = qs("#copyEmail");
   if (copyBtn){

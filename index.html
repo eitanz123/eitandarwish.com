@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -9,6 +9,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="landing landing--mock">
   <div class="bg-noise" aria-hidden="true"></div>
@@ -16,60 +20,40 @@
   <header class="landing__header">
     <div class="landing__brand">
       <div class="landing__name">Eitan Darwish</div>
-      <div class="landing__tagline">Business • Creative • Builder</div>
+      <div class="landing__tagline">MBA Candidate, Class of 2027</div>
     </div>
 
     <div class="landing__nav">
       <a class="nav__link" href="business-experiences.html">Business</a>
       <a class="nav__link" href="creative-experiences.html">Creative</a>
       <a class="nav__link" href="#contact">Contact</a>
-      <button id="themeToggle" class="btn btn--ghost" type="button" title="Toggle theme" aria-label="Toggle theme">
-        <span class="icon">◐</span>
-      </button>
     </div>
   </header>
 
-  <main class="landing__main landing__main--mock">
-    <div class="mockStage" role="navigation" aria-label="Choose a lane">
-      <!-- Business card -->
-      <a class="mockLink" href="business-experiences.html" aria-label="Open Business experiences">
-        <div class="americanCard" aria-hidden="true">
-          <div class="americanCard__inner">
-            <div class="americanCard__top">
-              <div class="americanCard__name">EITAN DARWISH</div>
-              <div class="americanCard__sub">BUSINESS EXPERIENCES</div>
-            </div>
-            <div class="americanCard__rule"></div>
-            <div class="americanCard__rows">
-              <div class="americanCard__row"></div>
-              <div class="americanCard__row americanCard__row--short"></div>
-              <div class="americanCard__row americanCard__row--tiny"></div>
-            </div>
-          </div>
-        </div>
-      </a>
 
-      <div class="mockDivider" aria-hidden="true"></div>
-
-      <!-- Creative: Pearl Glass Pebble (image asset) -->
-      <a class="mockLink" href="creative-experiences.html" aria-label="Open Creative experiences">
-        <div class="pearlStone pearlStone--img" aria-hidden="true">
-          <img
-            class="pearlStone__img"
-            src="images/tiles/pearl-stone-1200-clean.png"
-            srcset="images/tiles/pearl-stone-1200-clean.png 1x, images/tiles/pearl-stone-2400-clean.png 2x"
-            width="600"
-            height="388"
-            alt=""
-          />
-          <div class="pearlStone__text">
-            <div class="pearlStone__title">CREATIVE</div>
-            <div class="pearlStone__sub">EXPLORE EXPERIENCES</div>
-          </div>
-        </div>
-      </a>
+  <section class="landingSplit" aria-label="Explore">
+  <a class="landingCard landingCard--business" href="business-experiences.html" aria-label="Business">
+    <div class="bizCard" aria-hidden="true">
+      <div class="bizCard__email">EITAN@DARWISH.COM</div>
+      <div class="bizCard__center">BUSINESS</div>
     </div>
-  </main>
+  </a>
+
+  <a class="landingCard landingCard--creative" href="creative-experiences.html" aria-label="Creative">
+    <div class="pearlStone pearlStone--img" aria-hidden="true">
+      <img
+        class="pearlStone__img"
+        src="images/tiles/pearl-stone-1200-clean.png"
+        srcset="images/tiles/pearl-stone-1200-clean.png 1x, images/tiles/pearl-stone-2400-clean.png 2x"
+        width="600"
+        height="388"
+        alt=""
+      />
+      <div class="pearlStone__text">
+        <div class="pearlStone__title">CREATIVE</div>
+      </div>
+    </div>
+  </section>
 
   <footer id="contact" class="landing__footer">
     <div class="landing__footerInner">
@@ -97,10 +81,6 @@
     }
     loadTheme();
     document.getElementById("year").textContent = new Date().getFullYear();
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      const cur = localStorage.getItem("theme") || "dark";
-      setTheme(cur === "light" ? "dark" : "light");
-    });
   </script>
 </body>
 </html>

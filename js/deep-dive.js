@@ -83,14 +83,6 @@ async function init(){
   const year = qs("#year");
   if (year) year.textContent = new Date().getFullYear();
 
-  const themeBtn = qs("#themeToggle");
-  if (themeBtn){
-    themeBtn.addEventListener("click", () => {
-      const cur = localStorage.getItem("theme") || "dark";
-      setTheme(cur === "light" ? "dark" : "light");
-    });
-  }
-
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("slug");
 

@@ -42,12 +42,12 @@
     return rows;
   }
 
-  function toBool(v) {
-    return String(v || "").trim().toUpperCase() === "TRUE";
+  function clean(v) {
+    return String(v ?? "").trim();
   }
 
-  function clean(v) {
-    return String(v || "").trim();
+  function toBool(v) {
+    return String(v ?? "").trim().toUpperCase() === "TRUE";
   }
 
   function splitTags(v) {
@@ -57,59 +57,18 @@
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean)
-      .slice(0, 12);
+      .slice(0, 8);
   }
 
-  function formatDates(start, end, isCurrent) {
-    const s = clean(start);
-    const e = clean(end);
-    const curr = toBool(isCurrent);
-    if (!s && !e && !curr) return "";
-    if (s && (e || curr)) return `${s} — ${curr ? "Present" : e}`;
-    if (s) return s;
-    if (e) return e;
-    return "Present";
-  }
-
-  async function fetchTiles() {
-    const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to fetch sheet: ${res.status}`);
-    const csv = await res.text();
-
-    const rows = parseCSV(csv);
-    if (rows.length < 2) return [];
-
-    const headers = rows[0].map((h) => clean(h));
-    const dataRows = rows.slice(1);
-
-    return dataRows
-      .map((r) => {
-        const obj = {};
-        headers.forEach((h, idx) => (obj[h] = r[idx] ?? ""));
-        return {
-          slug: clean(obj.slug),
-          lane: clean(obj.lane),
-          size: clean(obj.size), // small | medium | large
-          parent_slug: clean(obj.parent_slug),
-          child_order: Number(clean(obj.child_order) || 0),
-          title: clean(obj.title),
-          subtitle: clean(obj.subtitle),
-          tags: splitTags(obj.tags),
-          image_url: clean(obj.image_url),
-          thumb_url: clean(obj.thumb_url),
-          href: clean(obj.href),
-          body_md: String(obj.body_md || "").trim(),
-          start_date: clean(obj.start_date),
-          end_date: clean(obj.end_date),
-          is_current: obj.is_current,
-          published: obj.published,
-          featured: obj.featured,
-          sort: Number(clean(obj.sort) || 9999),
-        };
-      })
-      .filter((t) => t.slug && t.lane && t.size)
-      .filter((t) => toBool(t.published))
-      .sort((a, b) => (a.sort - b.sort) || a.title.localeCompare(b.title));
+  function firstUrl(v) {
+    const s = clean(v);
+    if (!s) return "";
+    return (
+      s
+        .split(/[\n,]+/g)
+        .map((x) => x.trim())
+        .filter(Boolean)[0] || ""
+    );
   }
 
   function escapeHTML(s) {
@@ -121,29 +80,214 @@
       .replaceAll("'", "&#039;");
   }
 
-  function tileHref(tile) {
-    if (tile.href) return tile.href;
-    return `deep-dive.html?slug=${encodeURIComponent(tile.slug)}`;
+  function normalizeText(s) {
+    return clean(s).toLowerCase();
   }
 
-  function tileHTML(tile) {
+  function formatDates(start, end, isCurrent) {
+    const s = clean(start);
+    const e = clean(end);
+    const curr = toBool(isCurrent);
+
+    if (!s && !e && !curr) return "";
+    if (s && (e || curr)) return `${s} — ${curr ? "Present" : e}`;
+    if (s) return s;
+    if (e) return e;
+    return "Present";
+  }
+
+  function isYouTubeUrl(url) {
+    return /(^https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+  }
+
+  function getYouTubeId(url) {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtu.be")) {
+        return u.pathname.replace("/", "").split("/")[0] || "";
+      }
+      if (u.searchParams.get("v")) return u.searchParams.get("v") || "";
+      const parts = u.pathname.split("/").filter(Boolean);
+      const iEmbed = parts.indexOf("embed");
+      if (iEmbed >= 0 && parts[iEmbed + 1]) return parts[iEmbed + 1];
+      const iShorts = parts.indexOf("shorts");
+      if (iShorts >= 0 && parts[iShorts + 1]) return parts[iShorts + 1];
+      return "";
+    } catch {
+      const m =
+        url.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/i) ||
+        url.match(/[?&]v=([A-Za-z0-9_-]{6,})/i) ||
+        url.match(/\/embed\/([A-Za-z0-9_-]{6,})/i) ||
+        url.match(/\/shorts\/([A-Za-z0-9_-]{6,})/i);
+      return m?.[1] || "";
+    }
+  }
+
+  function youtubeThumb(url) {
+    const id = getYouTubeId(url);
+    if (!id) return "";
+    return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+  }
+
+  function safeHref(url) {
+    const u = clean(url);
+    if (!u) return "";
+    const lower = u.toLowerCase();
+    if (lower.startsWith("http://") || lower.startsWith("https://") || lower.startsWith("mailto:")) return u;
+    return "";
+  }
+
+  function renderMarkdown(md) {
+    const raw = String(md ?? "").trim();
+    if (!raw) return "";
+
+    let s = escapeHTML(raw).replace(/\r\n/g, "\n");
+
+    // [text](url)
+    s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, text, url) => {
+      const href = safeHref(url);
+      if (!href) return text;
+      return `<a href="${escapeHTML(href)}" target="_blank" rel="noopener">${text}</a>`;
+    });
+
+    // **bold**
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+
+    const lines = s.split("\n");
+    let html = "";
+    let inList = false;
+
+    const closeList = () => {
+      if (inList) {
+        html += "</ul>";
+        inList = false;
+      }
+    };
+
+    for (const line of lines) {
+      const l = line.trim();
+      if (!l) {
+        closeList();
+        continue;
+      }
+      if (l.startsWith("### ")) {
+        closeList();
+        html += `<h4>${l.slice(4)}</h4>`;
+        continue;
+      }
+      if (l.startsWith("## ")) {
+        closeList();
+        html += `<h3>${l.slice(3)}</h3>`;
+        continue;
+      }
+      if (l.startsWith("# ")) {
+        closeList();
+        html += `<h2>${l.slice(2)}</h2>`;
+        continue;
+      }
+      if (l.startsWith("- ") || l.startsWith("* ")) {
+        if (!inList) {
+          html += "<ul>";
+          inList = true;
+        }
+        html += `<li>${l.slice(2)}</li>`;
+        continue;
+      }
+      closeList();
+      html += `<p>${l}</p>`;
+    }
+
+    closeList();
+    return html;
+  }
+
+  async function fetchTiles() {
+    const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Failed to fetch sheet: ${res.status}`);
+    const csv = await res.text();
+
+    const rows = parseCSV(csv);
+    if (rows.length < 2) return [];
+
+    const headers = rows[0].map(clean);
+    const dataRows = rows.slice(1);
+
+    return dataRows
+      .map((r) => {
+        const obj = {};
+        headers.forEach((h, idx) => (obj[h] = r[idx] ?? ""));
+
+        const tile = {
+          slug: clean(obj.slug),
+          lane: clean(obj.lane),
+          size: clean(obj.size),
+
+          parent_slug: clean(obj.parent_slug),
+          child_order: Number(clean(obj.child_order) || 0),
+
+          title: clean(obj.title),
+          subtitle: clean(obj.subtitle),
+          tags: splitTags(obj.tags),
+
+          image_url: firstUrl(obj.image_url),
+          video_url: firstUrl(obj.video_url),
+          thumb_url: firstUrl(obj.thumb_url),
+
+          href: clean(obj.href),
+          body_md: String(obj.body_md ?? "").trim(),
+
+          start_date: clean(obj.start_date),
+          end_date: clean(obj.end_date),
+          is_current: obj.is_current,
+
+          published: obj.published,
+          featured: obj.featured,
+          sort: Number(clean(obj.sort) || 9999),
+        };
+
+        tile._search = normalizeText([tile.title, tile.subtitle, tile.tags.join(" ")].join(" "));
+        return tile;
+      })
+      .filter((t) => t.slug && t.lane && t.size)
+      .filter((t) => toBool(t.published))
+      .sort((a, b) => a.sort - b.sort || a.title.localeCompare(b.title));
+  }
+
+  // CARD view: show media ONLY if image_url exists
+  function cardMediaThumb(tile) {
+    return tile.image_url ? tile.image_url : "";
+  }
+
+  // MODAL view: image, else video thumb
+  function modalMediaThumb(tile) {
+    if (tile.image_url) return tile.image_url;
+    if (!tile.video_url) return "";
+    if (tile.thumb_url) return tile.thumb_url;
+    if (isYouTubeUrl(tile.video_url)) return youtubeThumb(tile.video_url);
+    return "";
+  }
+
+  // MINIMAL card: title + subtitle + tags + optional image (image only)
+  function tileCardHTML(tile, extraClass = "") {
     const laneClass = tile.lane === "creative" ? "tile--creative" : "tile--business";
     const sizeClass = tile.size ? `tile--${tile.size}` : "tile--medium";
-    const mediaStyle = tile.image_url
-      ? `style="background-image:url('${tile.image_url.replace(/'/g, "\\'")}')"`
+
+    const thumb = cardMediaThumb(tile);
+    const hasMedia = Boolean(thumb);
+
+    const mediaHTML = hasMedia
+      ? `<div class="tile__media hasImage" style="background-image:url('${thumb.replace(/'/g, "\\'")}')"></div>`
       : "";
 
-    const dates = formatDates(tile.start_date, tile.end_date, tile.is_current);
-
     return `
-      <a class="tile ${laneClass} ${sizeClass}" href="${tileHref(tile)}" data-slug="${tile.slug}">
-        <div class="tile__media ${tile.image_url ? "hasImage" : ""}" ${mediaStyle}></div>
-
+      <button type="button"
+        class="tile ${laneClass} ${sizeClass} ${hasMedia ? "tile--hasMedia" : "tile--noMedia"} ${extraClass}"
+        data-slug="${escapeHTML(tile.slug)}"
+        aria-haspopup="dialog">
+        ${mediaHTML}
         <div class="tile__content">
-          <p class="tile__kicker">${escapeHTML(tile.lane.toUpperCase())} • ${escapeHTML(tile.size.toUpperCase())}</p>
           <h3 class="tile__title">${escapeHTML(tile.title)}</h3>
           ${tile.subtitle ? `<p class="tile__subtitle">${escapeHTML(tile.subtitle)}</p>` : ""}
-          ${dates ? `<div class="tile__dates">${escapeHTML(dates)}</div>` : ""}
           ${
             tile.tags.length
               ? `<div class="tile__metaRow">${tile.tags
@@ -152,237 +296,293 @@
               : ""
           }
         </div>
-      </a>
+      </button>
     `;
   }
 
-  // ---------- Filtering logic ----------
-  const state = {
-    lane: null,
-    q: "",
-    activeTag: "",
-    allTiles: [],
-  };
+  function buildLaneIndex(tiles, lane) {
+    const topLevel = tiles.filter((t) => t.lane === lane && !t.parent_slug);
+    const children = tiles.filter((t) => t.lane === lane && t.parent_slug);
 
-  function normalize(s) {
-    return clean(s).toLowerCase();
-  }
+    const bySlug = new Map();
+    for (const t of tiles) bySlug.set(t.slug, t);
 
-  function matches(tile) {
-    // Tag filter
-    if (state.activeTag) {
-      const tagMatch = tile.tags.some((t) => normalize(t) === normalize(state.activeTag));
-      if (!tagMatch) return false;
+    const byParent = new Map();
+    for (const c of children) {
+      if (!byParent.has(c.parent_slug)) byParent.set(c.parent_slug, []);
+      byParent.get(c.parent_slug).push(c);
+    }
+    for (const [k, arr] of byParent.entries()) {
+      arr.sort((a, b) => (a.child_order - b.child_order) || (a.sort - b.sort));
     }
 
-    // Search filter: title/subtitle/tags/body
-    const q = normalize(state.q);
-    if (!q) return true;
-
-    const hay = [
-      tile.title,
-      tile.subtitle,
-      tile.tags.join(" "),
-      tile.body_md,
-      tile.slug,
-    ]
-      .map(normalize)
-      .join(" • ");
-
-    return hay.includes(q);
+    return { tiles, lane, topLevel, byParent, bySlug };
   }
 
-  function applyFilters(tiles) {
-    return tiles.filter(matches);
-  }
+  function renderLaneFiltered(index, rootEl, matchFn) {
+    const out = [];
+    let shownCount = 0;
 
-  function buildTagList(tilesForLane) {
-    const map = new Map(); // tag -> count
-    for (const t of tilesForLane) {
-      for (const tag of t.tags) {
-        const key = clean(tag);
-        if (!key) continue;
-        map.set(key, (map.get(key) || 0) + 1);
-      }
-    }
-    // sort by count desc, then alpha
-    return [...map.entries()]
-      .sort((a, b) => (b[1] - a[1]) || a[0].localeCompare(b[0]))
-      .map(([tag]) => tag);
-  }
+    for (const parent of index.topLevel) {
+      const kids = index.byParent.get(parent.slug) || [];
 
-  function renderTagChips(tags, el) {
-    if (!el) return;
-    el.innerHTML = tags
-      .map((tag) => {
-        const active = normalize(tag) === normalize(state.activeTag);
-        return `<button class="chipBtn ${active ? "is-active" : ""}" type="button" data-tag="${escapeHTML(tag)}">${escapeHTML(tag)}</button>`;
-      })
-      .join("");
+      const parentMatches = matchFn(parent);
+      const matchingKids = kids.filter(matchFn);
 
-    el.querySelectorAll("button[data-tag]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const tag = btn.getAttribute("data-tag") || "";
-        state.activeTag = normalize(tag) === normalize(state.activeTag) ? "" : tag;
-        refresh();
-      });
-    });
-  }
-
-  function setResultsMeta(el, count, total) {
-    if (!el) return;
-    const tagPart = state.activeTag ? ` • tag: ${state.activeTag}` : "";
-    const qPart = state.q ? ` • search: “${state.q}”` : "";
-    el.textContent = `${count} / ${total} shown${tagPart}${qPart}`;
-  }
-
-  // ---------- Rendering lane with grouping ----------
-  function renderLane(tiles, lane, rootEl) {
-    const bySlug = new Map(tiles.map((t) => [t.slug, t]));
-
-    // Top-level = no parent OR parent missing (orphan children become standalone)
-    const topLevel = tiles.filter(
-        (t) => t.lane === lane && (!t.parent_slug || !bySlug.has(t.parent_slug))
-    );
-
-    // Children = only those whose parent exists in this render set
-    const children = tiles.filter(
-        (t) => t.lane === lane && t.parent_slug && bySlug.has(t.parent_slug)
-    );
-
-
-    const groups = topLevel.map((parent) => {
-      const kids = children
-        .filter((c) => c.parent_slug === parent.slug)
-        .sort((a, b) => (a.child_order - b.child_order) || (a.sort - b.sort));
-
+      // large parents: include if parent matches OR any child matches
       if (parent.size === "large" && kids.length) {
-        return `
-          <section class="tileGroup">
-            ${tileHTML(parent)}
-            <div class="tileGroup__children">
-              ${kids.map(tileHTML).join("")}
-            </div>
-          </section>
-        `;
+        if (!parentMatches && matchingKids.length === 0) continue;
+        out.push(tileCardHTML(parent));
+        shownCount += 1;
+        continue;
       }
-      return tileHTML(parent);
-    });
 
-    const standalone = groups.filter((g) => g.trimStart().startsWith("<a "));
-    const grouped = groups.filter((g) => g.trimStart().startsWith("<section"));
+      if (!parentMatches) continue;
+      out.push(tileCardHTML(parent));
+      shownCount += 1;
+    }
 
+    rootEl.innerHTML = `<div class="tilesGrid">${out.join("")}</div>`;
+    return shownCount;
+  }
 
-    rootEl.innerHTML = `
-      ${grouped.join("")}
-      <div class="tilesGrid">
-        ${standalone.join("")}
+  function ensureModal() {
+    let overlay = document.getElementById("tileModalOverlay");
+    if (overlay) return overlay;
+
+    overlay = document.createElement("div");
+    overlay.id = "tileModalOverlay";
+    overlay.className = "tileModalOverlay";
+    overlay.setAttribute("aria-hidden", "true");
+
+    overlay.innerHTML = `
+      <div class="tileModal" role="dialog" aria-modal="true" aria-labelledby="tileModalTitle">
+        <button type="button" class="tileModal__close" aria-label="Close">✕</button>
+        <div class="tileModal__inner">
+          <div id="tileModalMedia" class="tileModal__media" style="display:none;"></div>
+
+          <div class="tileModal__head">
+            <h2 id="tileModalTitle" class="tileModal__title"></h2>
+            <div id="tileModalSub" class="tileModal__sub"></div>
+            <div id="tileModalMeta" class="tileModal__meta"></div>
+          </div>
+
+          <div id="tileModalTags" class="tileModal__tags"></div>
+
+          <div id="tileModalBody" class="tileModal__body"></div>
+
+          <div id="tileModalChildrenWrap" class="tileModal__childrenWrap" style="display:none;">
+            <div class="tileModal__childrenLabel">Included work</div>
+            <div id="tileModalChildren" class="tileModal__children"></div>
+          </div>
+
+          <div id="tileModalActions" class="tileModal__actions" style="display:none;"></div>
+        </div>
       </div>
     `;
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal();
+    });
+
+    overlay.querySelector(".tileModal__close")?.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && document.body.classList.contains("modal-open")) closeModal();
+    });
+
+    return overlay;
   }
 
-  // ---------- Wire UI + refresh ----------
-  function refresh() {
-    const rootId = document.body.getAttribute("data-tiles-root") || "tilesRoot";
-    const root = document.getElementById(rootId);
-    if (!root) return;
+  function openModalWithTile(index, tile) {
+    const overlay = ensureModal();
 
-    const laneTiles = state.allTiles.filter((t) => t.lane === state.lane);
-    const filtered = applyFilters(laneTiles);
+    const titleEl = overlay.querySelector("#tileModalTitle");
+    const subEl = overlay.querySelector("#tileModalSub");
+    const metaEl = overlay.querySelector("#tileModalMeta");
+    const tagsEl = overlay.querySelector("#tileModalTags");
+    const bodyEl = overlay.querySelector("#tileModalBody");
+    const mediaEl = overlay.querySelector("#tileModalMedia");
+    const childrenWrap = overlay.querySelector("#tileModalChildrenWrap");
+    const childrenEl = overlay.querySelector("#tileModalChildren");
+    const actionsEl = overlay.querySelector("#tileModalActions");
 
-    // IMPORTANT: keep hierarchy coherent:
-    // - If a child matches, include its parent.
-    // - If a parent matches, include it (and allow its kids to show only if they match).
-    const bySlug = new Map(laneTiles.map((t) => [t.slug, t]));
-    const keep = new Map();
+    titleEl.textContent = tile.title || "";
+    subEl.textContent = tile.subtitle || "";
 
-    for (const t of filtered) {
-      keep.set(t.slug, t);
-      if (t.parent_slug) {
-        const p = bySlug.get(t.parent_slug);
-        if (p) keep.set(p.slug, p);
-      }
+    const dates = formatDates(tile.start_date, tile.end_date, tile.is_current);
+    const parts = [];
+    if (tile.lane) parts.push(tile.lane.toUpperCase());
+    if (tile.size) parts.push(tile.size.toUpperCase());
+    if (dates) parts.push(dates);
+    metaEl.textContent = parts.join(" • ");
+
+    tagsEl.innerHTML = tile.tags?.length
+      ? tile.tags.map((t) => `<span class="pill">${escapeHTML(t)}</span>`).join("")
+      : "";
+
+    bodyEl.innerHTML = tile.body_md ? renderMarkdown(tile.body_md) : "";
+
+    const hero = modalMediaThumb(tile);
+    if (hero) {
+      mediaEl.style.display = "";
+      mediaEl.style.backgroundImage = `url('${hero.replace(/'/g, "\\'")}')`;
+    } else {
+      mediaEl.style.display = "none";
+      mediaEl.style.backgroundImage = "none";
     }
 
-    // Now decide which children to show:
-    // - show children if they themselves match filters
-    // - but only under parents that are kept
-    const keptList = [...keep.values()];
+    const actions = [];
+    const hrefSafe = safeHref(tile.href);
+    const videoSafe = safeHref(tile.video_url);
+    if (hrefSafe) actions.push(`<a class="btn" target="_blank" rel="noopener" href="${escapeHTML(hrefSafe)}">Open link</a>`);
+    if (videoSafe) actions.push(`<a class="btn btn--ghost" target="_blank" rel="noopener" href="${escapeHTML(videoSafe)}">Watch video</a>`);
 
-    // We want to render:
-    // - Top-level parents that are kept
-    // - Children that match, under their parent
-    // So we pass a tiles list that includes:
-    // - all kept top-level tiles
-    // - matching children only
-    const matchingChildren = filtered.filter((t) => t.parent_slug);
-    const matchingTopLevel = keptList.filter((t) => !t.parent_slug);
-
-    const renderList = [...matchingTopLevel, ...matchingChildren]
-      .filter((t) => t.lane === state.lane)
-      .sort((a, b) => (a.sort - b.sort) || a.title.localeCompare(b.title));
-
-    renderLane(renderList, state.lane, root);
-
-    const resultsMeta = document.getElementById("resultsMeta");
-    setResultsMeta(resultsMeta, filtered.length, laneTiles.length);
-
-    // Update chip active state
-    const chipWrap = document.getElementById("tagChips");
-    if (chipWrap) {
-      chipWrap.querySelectorAll("button[data-tag]").forEach((btn) => {
-        const tag = btn.getAttribute("data-tag") || "";
-        btn.classList.toggle("is-active", normalize(tag) === normalize(state.activeTag));
-      });
+    if (actions.length) {
+      actionsEl.style.display = "";
+      actionsEl.innerHTML = actions.join("");
+    } else {
+      actionsEl.style.display = "none";
+      actionsEl.innerHTML = "";
     }
+
+    // ✅ children as REAL tiles (not mini tiles)
+    const kids = index.byParent.get(tile.slug) || [];
+    if (tile.size === "large" && kids.length) {
+      childrenWrap.style.display = "";
+      childrenEl.innerHTML = `
+        <div class="tilesGrid tilesGrid--modal">
+          ${kids.map((k) => tileCardHTML(k, "tile--inModal")).join("")}
+        </div>
+      `;
+    } else {
+      childrenWrap.style.display = "none";
+      childrenEl.innerHTML = "";
+    }
+
+    overlay.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    overlay.querySelector(".tileModal__close")?.focus();
+
+    // Clicking child tile opens it
+    childrenEl.onclick = (e) => {
+      e.preventDefault?.(); // extra safety
+      const btn = e.target.closest("[data-slug]");
+      if (!btn) return;
+      const slug = btn.getAttribute("data-slug");
+      const next = index.bySlug.get(slug);
+      if (next) openModalWithTile(index, next);
+    };
+  }
+
+  function closeModal() {
+    const overlay = document.getElementById("tileModalOverlay");
+    if (!overlay) return;
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
   }
 
   async function initFromBody() {
-    state.lane = document.body.getAttribute("data-lane");
-    if (!state.lane) return;
-
+    const lane = document.body.getAttribute("data-lane");
     const rootId = document.body.getAttribute("data-tiles-root") || "tilesRoot";
+    if (!lane) return;
+
     const root = document.getElementById(rootId);
     if (!root) return;
 
+    const searchInput = document.getElementById("searchInput");
+    const chipRoot = document.getElementById("tagChips");
+    const clearBtn = document.getElementById("clearFilters");
+    const resultsMeta = document.getElementById("resultsMeta");
+
     try {
-      state.allTiles = await fetchTiles();
+      const tiles = await fetchTiles();
+      const index = buildLaneIndex(tiles, lane);
 
-      // Build tag chips from this lane only
-      const laneTiles = state.allTiles.filter((t) => t.lane === state.lane);
-      const tags = buildTagList(laneTiles);
+      const allTags = Array.from(
+        new Set(tiles.filter((t) => t.lane === lane).flatMap((t) => t.tags))
+      ).sort((a, b) => a.localeCompare(b));
 
-      renderTagChips(tags, document.getElementById("tagChips"));
+      const selected = new Set();
+      let query = "";
 
-      // Wire search + clear if present
-      const searchInput = document.getElementById("searchInput");
-      if (searchInput) {
-        searchInput.addEventListener("input", (e) => {
-          state.q = e.target.value || "";
-          refresh();
+      if (chipRoot) {
+        chipRoot.innerHTML = allTags
+          .map((t) => `<button type="button" class="chipBtn" data-tag="${escapeHTML(t)}">${escapeHTML(t)}</button>`)
+          .join("");
+      }
+
+      function matches(tile) {
+        if (selected.size) {
+          const hasAny = tile.tags.some((t) => selected.has(t));
+          if (!hasAny) return false;
+        }
+        if (query) {
+          if (!tile._search.includes(query)) return false;
+        }
+        return true;
+      }
+
+      function rerender() {
+        const shown = renderLaneFiltered(index, root, matches);
+        if (resultsMeta) resultsMeta.textContent = `${shown} shown`;
+      }
+
+      if (chipRoot) {
+        chipRoot.addEventListener("click", (e) => {
+          const btn = e.target.closest(".chipBtn");
+          if (!btn) return;
+          const tag = btn.getAttribute("data-tag");
+          if (!tag) return;
+
+          if (selected.has(tag)) {
+            selected.delete(tag);
+            btn.classList.remove("is-active");
+          } else {
+            selected.add(tag);
+            btn.classList.add("is-active");
+          }
+          rerender();
         });
       }
 
-      const clearBtn = document.getElementById("clearFilters");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          query = normalizeText(searchInput.value);
+          rerender();
+        });
+      }
+
       if (clearBtn) {
         clearBtn.addEventListener("click", () => {
-          state.q = "";
-          state.activeTag = "";
-          const si = document.getElementById("searchInput");
-          if (si) si.value = "";
-          refresh();
+          selected.clear();
+          query = "";
+          if (searchInput) searchInput.value = "";
+          if (chipRoot) chipRoot.querySelectorAll(".chipBtn.is-active").forEach((b) => b.classList.remove("is-active"));
+          rerender();
         });
       }
 
-      // Initial render
-      refresh();
+      // ✅ event delegation: ALWAYS prevent navigation
+      root.addEventListener("click", (e) => {
+        e.preventDefault?.();
+        const el = e.target.closest("[data-slug]");
+        if (!el) return;
+        const slug = el.getAttribute("data-slug");
+        const tile = index.bySlug.get(slug);
+        if (tile) openModalWithTile(index, tile);
+      });
+
+      rerender();
     } catch (err) {
       console.error(err);
-      root.innerHTML = `<p style="color: rgba(255,255,255,0.75);">Could not load tiles from the CMS.</p>`;
+      root.innerHTML = `<p style="color: rgba(15,23,42,0.65);">Could not load tiles from the CMS.</p>`;
     }
   }
 
   document.addEventListener("DOMContentLoaded", initFromBody);
-
   window.PortfolioCMS = { fetchTiles };
 })();
+
