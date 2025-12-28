@@ -1,0 +1,418 @@
+{
+  "schema_version": "1.0",
+  "experiences": [
+    {
+      "slug": "mckinsey-engagements",
+      "bucket": "business",
+      "kicker": "McKinsey & Company",
+      "title": "Engagement Manager / Associate",
+      "subtitle": "Strategy & transformation across food, CPG, and growth-stage work",
+      "timeframe": "2019\u20132023",
+      "location": "New York, NY",
+      "detail_level": "H",
+      "tags": [
+        {
+          "group": "Company",
+          "value": "McKinsey"
+        },
+        {
+          "group": "Industry",
+          "value": "Food & Ag"
+        },
+        {
+          "group": "Industry",
+          "value": "CPG"
+        },
+        {
+          "group": "Work Type",
+          "value": "Strategy"
+        },
+        {
+          "group": "Work Type",
+          "value": "Commercialization"
+        },
+        {
+          "group": "Work Type",
+          "value": "Private Equity"
+        }
+      ],
+      "summary": "Led teams on strategy and growth problems, often at the intersection of innovation, commercialization, and operational execution.",
+      "content": {
+        "paragraphs": [
+          "Representative themes: portfolio strategy, commercialization roadmaps, operating model design, and diligence-style analysis.",
+          "I like ambiguous problems where a clean narrative needs to be backed by real numbers."
+        ],
+        "links": [
+          {
+            "label": "LinkedIn (placeholder)",
+            "url": "https://www.linkedin.com"
+          }
+        ],
+        "media": []
+      },
+      "sub_experiences": [
+        {
+          "slug": "mckinsey-1",
+          "kicker": "Example engagement",
+          "title": "Food-tech commercialization roadmap",
+          "subtitle": "Scaled an early-stage platform toward repeatable GTM",
+          "timeframe": "12 weeks",
+          "location": "NYC",
+          "summary": "Built a cost-down + commercialization roadmap; aligned stakeholders around a sequenced plan.",
+          "tags": [
+            {
+              "group": "Industry",
+              "value": "Food-Tech"
+            },
+            {
+              "group": "Work Type",
+              "value": "Commercialization"
+            }
+          ],
+          "content": {
+            "paragraphs": [
+              "Work product included a cost parity model, partner landscape, and phased customer acquisition plan."
+            ],
+            "links": [],
+            "media": []
+          }
+        },
+        {
+          "slug": "mckinsey-2",
+          "kicker": "Example engagement",
+          "title": "Private equity diligence \u2014 restaurants",
+          "subtitle": "Market sizing + unit economics + expansion thesis",
+          "timeframe": "3 weeks",
+          "location": "Remote",
+          "summary": "Built the investment narrative under time pressure; pressure-tested the growth plan.",
+          "tags": [
+            {
+              "group": "Industry",
+              "value": "Restaurants"
+            },
+            {
+              "group": "Work Type",
+              "value": "Private Equity"
+            }
+          ],
+          "content": {
+            "paragraphs": [],
+            "links": [],
+            "media": []
+          }
+        }
+      ]
+    },
+    {
+      "slug": "every-company",
+      "bucket": "business",
+      "kicker": "The EVERY Company",
+      "title": "Chief of Staff / Strategy",
+      "subtitle": "Precision fermentation \u2014 building a category",
+      "timeframe": "2023\u20132024",
+      "location": "San Francisco Bay Area",
+      "detail_level": "M",
+      "tags": [
+        {
+          "group": "Company",
+          "value": "EVERY"
+        },
+        {
+          "group": "Industry",
+          "value": "Food-Tech"
+        },
+        {
+          "group": "Work Type",
+          "value": "Strategy"
+        },
+        {
+          "group": "Work Type",
+          "value": "Ops"
+        }
+      ],
+      "summary": "Supported leadership across strategy, cross-functional execution, and narrative building for a high-growth food-tech company.",
+      "content": {
+        "paragraphs": [
+          "Worked on priorities spanning commercialization, partner strategy, and internal operating cadence.",
+          "Helped translate complex technical realities into crisp decisions and timelines."
+        ],
+        "links": [
+          {
+            "label": "Company site",
+            "url": "https://www.theeverycompany.com"
+          }
+        ],
+        "media": []
+      },
+      "sub_experiences": []
+    },
+    {
+      "slug": "uc-davis-consulting",
+      "bucket": "business",
+      "kicker": "Consulting",
+      "title": "UC Davis commercialization hub",
+      "subtitle": "Benchmarking + operating model design",
+      "timeframe": "2025",
+      "location": "California",
+      "detail_level": "L",
+      "tags": [
+        {
+          "group": "Company",
+          "value": "UC Davis"
+        },
+        {
+          "group": "Industry",
+          "value": "Food & Ag"
+        },
+        {
+          "group": "Work Type",
+          "value": "Commercialization"
+        },
+        {
+          "group": "Work Type",
+          "value": "Operating Model"
+        }
+      ],
+      "summary": "Helping UC Davis design a model to become a global hub for food & ag tech commercialization.",
+      "content": {
+        "paragraphs": [],
+        "links": [],
+        "media": []
+      },
+      "sub_experiences": []
+    },
+    {
+      "slug": "college-pulse",
+      "bucket": "business",
+      "kicker": "College Pulse",
+      "title": "Research & Analytics",
+      "subtitle": "Survey design + insights",
+      "timeframe": "2017\u20132019",
+      "location": "Remote / US",
+      "detail_level": "L",
+      "tags": [
+        {
+          "group": "Company",
+          "value": "College Pulse"
+        },
+        {
+          "group": "Industry",
+          "value": "EdTech"
+        },
+        {
+          "group": "Work Type",
+          "value": "Analytics"
+        }
+      ],
+      "summary": "Built surveys and insights pipelines to understand student sentiment at scale.",
+      "content": {
+        "paragraphs": [],
+        "links": [],
+        "media": []
+      },
+      "sub_experiences": []
+    },
+    {
+      "slug": "wingen",
+      "bucket": "business",
+      "kicker": "Venture",
+      "title": "WinGen (lead gen + CRM)",
+      "subtitle": "Home services growth platform",
+      "timeframe": "2024\u20132025",
+      "location": "Palo Alto / Remote",
+      "detail_level": "M",
+      "tags": [
+        {
+          "group": "Company",
+          "value": "WinGen"
+        },
+        {
+          "group": "Industry",
+          "value": "Home Services"
+        },
+        {
+          "group": "Work Type",
+          "value": "Product"
+        },
+        {
+          "group": "Work Type",
+          "value": "Growth"
+        }
+      ],
+      "summary": "Building a lead generation + CRM integration layer for local service businesses.",
+      "content": {
+        "paragraphs": [
+          "Focus: lightweight onboarding, integrations, and an operator-friendly workflow.",
+          "This site architecture (data-driven cards + CMS) is similar to how I like building products: modular, fast to iterate."
+        ],
+        "links": [],
+        "media": []
+      },
+      "sub_experiences": []
+    },
+    {
+      "slug": "earthship-biotecture",
+      "bucket": "creative",
+      "kicker": "Architecture / Sustainability",
+      "title": "Earthship Biotecture",
+      "subtitle": "Off-grid systems + construction",
+      "timeframe": "2018",
+      "location": "New Mexico",
+      "detail_level": "M",
+      "tags": [
+        {
+          "group": "Medium",
+          "value": "Build"
+        },
+        {
+          "group": "Theme",
+          "value": "Sustainability"
+        },
+        {
+          "group": "Output",
+          "value": "Fieldwork"
+        }
+      ],
+      "summary": "Hands-on experience building and learning off-grid architecture and water/energy systems.",
+      "content": {
+        "paragraphs": [
+          "I\u2019m drawn to physical systems: constraints are real, and feedback is immediate.",
+          "This experience shaped how I think about resource flows (energy, water, materials) and practical design."
+        ],
+        "links": [],
+        "media": []
+      },
+      "sub_experiences": []
+    },
+    {
+      "slug": "woodworking",
+      "bucket": "creative",
+      "kicker": "Craft",
+      "title": "Woodworking",
+      "subtitle": "Furniture, joinery, and iterative design",
+      "timeframe": "Ongoing",
+      "location": "Various",
+      "detail_level": "H",
+      "tags": [
+        {
+          "group": "Medium",
+          "value": "Woodworking"
+        },
+        {
+          "group": "Theme",
+          "value": "Craft"
+        },
+        {
+          "group": "Output",
+          "value": "Projects"
+        }
+      ],
+      "summary": "A long-running practice in making: tools, materials, and taste.",
+      "content": {
+        "paragraphs": [
+          "Woodworking is where I get to be both engineer and artist: structure and finish matter.",
+          "Over time I\u2019ve developed a preference for simple forms, strong joints, and intentional details."
+        ],
+        "links": [],
+        "media": []
+      },
+      "sub_experiences": [
+        {
+          "slug": "wood-1",
+          "kicker": "Project",
+          "title": "Walnut side table",
+          "subtitle": "Minimal geometry, thoughtful grain",
+          "timeframe": "2024",
+          "location": "CA",
+          "summary": "Designed and built a compact table with a clean silhouette and durable joinery.",
+          "tags": [
+            {
+              "group": "Medium",
+              "value": "Woodworking"
+            },
+            {
+              "group": "Output",
+              "value": "Furniture"
+            }
+          ],
+          "content": {
+            "paragraphs": [
+              "(Add build notes, process photos, and lessons learned.)"
+            ],
+            "links": [],
+            "media": []
+          }
+        },
+        {
+          "slug": "wood-2",
+          "kicker": "Project",
+          "title": "Workshop wall system",
+          "subtitle": "Tool storage + modularity",
+          "timeframe": "2025",
+          "location": "CA",
+          "summary": "Built a modular wall to keep tools visible and workflows smooth.",
+          "tags": [
+            {
+              "group": "Theme",
+              "value": "Systems"
+            },
+            {
+              "group": "Output",
+              "value": "Workshop"
+            }
+          ],
+          "content": {
+            "paragraphs": [],
+            "links": [],
+            "media": []
+          }
+        }
+      ]
+    },
+    {
+      "slug": "skull-evolution-video",
+      "bucket": "creative",
+      "kicker": "Media",
+      "title": "Human skull evolution video",
+      "subtitle": "Research + storytelling",
+      "timeframe": "2020",
+      "location": "Remote",
+      "detail_level": "M",
+      "tags": [
+        {
+          "group": "Medium",
+          "value": "Video"
+        },
+        {
+          "group": "Theme",
+          "value": "Science"
+        },
+        {
+          "group": "Output",
+          "value": "Short film"
+        }
+      ],
+      "summary": "Produced an educational video exploring the evolution of the human skull (script, narrative arc, visuals).",
+      "content": {
+        "paragraphs": [
+          "This is a good example of my creative workflow: research deeply, build a clear narrative, then execute with a high bar on clarity.",
+          "Swap the placeholder embed below with your real link."
+        ],
+        "links": [
+          {
+            "label": "Watch (placeholder)",
+            "url": "https://www.youtube.com"
+          }
+        ],
+        "media": [
+          {
+            "type": "embed",
+            "url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+            "caption": "Replace with your real embed URL"
+          }
+        ]
+      },
+      "sub_experiences": []
+    }
+  ]
+}

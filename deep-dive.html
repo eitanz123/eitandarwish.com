@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Deep Dive — Eitan Darwish</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <header class="container header header--compact">
+    <div class="header-top">
+      <div class="brand">
+        <a class="brand__name brand__name--link" href="index.html">Eitan Darwish</a>
+        <div class="brand__meta">Deep dive</div>
+      </div>
+      <nav class="nav">
+        <a id="backLink" class="nav__link" href="index.html#work">Back</a>
+        <button id="themeToggle" class="btn btn--ghost" type="button" title="Toggle theme" aria-label="Toggle theme">
+          <span class="icon">◐</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="detail" class="detail">
+      <div class="detail__header">
+        <div>
+          <div id="detailKicker" class="kicker"></div>
+          <h1 id="detailTitle"></h1>
+          <div id="detailMeta" class="detail__meta"></div>
+        </div>
+      </div>
+
+      <div id="detailTags" class="chips"></div>
+      <div id="detailBody" class="prose"></div>
+
+      <div id="subHead" class="subhead" style="display:none;">
+        <h2>Sub‑experiences</h2>
+        <div class="muted">Projects, deliverables, or notable moments inside this experience.</div>
+      </div>
+      <div id="subGrid" class="grid"></div>
+    </div>
+  </main>
+
+  <footer class="container footer">
+    <div>© <span id="year"></span> Eitan Darwish</div>
+  </footer>
+
+  <script src="js/deep-dive.js"></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Eitan Darwish</title>
+  <meta name="description" content="Portfolio — Business + Creative experience"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+  <div class="bg-noise" aria-hidden="true"></div>
+
+  <header class="container header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand__name">Eitan Darwish</div>
+        <div class="brand__meta">Business • Creative • Builder</div>
+      </div>
+      <nav class="nav">
+        <a class="nav__link" href="#work">Work</a>
+        <a class="nav__link" href="#about">About</a>
+        <a class="nav__link" href="#contact">Contact</a>
+        <button id="themeToggle" class="btn btn--ghost" type="button" title="Toggle theme" aria-label="Toggle theme">
+          <span class="icon">◐</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="hero">
+      <div class="hero__copy">
+        <h1>Two lanes, one story.</h1>
+        <p>
+          I build in two worlds: <strong>business</strong> (strategy, scaling, commercialization) and
+          <strong>creative</strong> (craft, media, systems). Browse either lane, filter by tags, and open the
+          level of detail you care about.
+        </p>
+
+        <div class="lane-toggle" role="tablist" aria-label="Experience lanes">
+          <button id="laneBusiness" class="segmented is-active" role="tab" aria-selected="true" type="button">Business</button>
+          <button id="laneCreative" class="segmented" role="tab" aria-selected="false" type="button">Creative</button>
+        </div>
+
+        <div class="hero__actions">
+          <a class="btn btn--primary" href="#work">Explore</a>
+          <a class="btn btn--ghost" href="data/Eitan_Darwish_Resume.pdf" target="_blank" rel="noopener">Download resume</a>
+        </div>
+      </div>
+
+      <div class="hero__card">
+        <div class="mini">
+          <div class="mini__label">How to read this site</div>
+          <ul class="mini__list">
+            <li><span class="pill pill--l">L</span> quick expansion</li>
+            <li><span class="pill pill--m">M</span> modal mini‑page</li>
+            <li><span class="pill pill--h">H</span> full deep dive</li>
+          </ul>
+          <div class="mini__hint">Tip: use tags to narrow by company, industry, medium, or theme.</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="work" class="section">
+      <div class="section__head">
+        <h2>Experience</h2>
+        <div class="section__sub">Cards are filterable. Detail level varies by story.</div>
+      </div>
+
+      <div class="filters">
+        <div class="filters__left">
+          <label class="field">
+            <span class="field__label">Search</span>
+            <input id="searchInput" class="input" type="search" placeholder="Try: McKinsey, Food-Tech, Woodworking…"/>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Tag group</span>
+            <select id="tagGroupSelect" class="select">
+              <option value="__all__">All</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="filters__right">
+          <button id="clearFilters" class="btn btn--ghost" type="button">Clear filters</button>
+        </div>
+      </div>
+
+      <div id="tagChips" class="chips" aria-label="Tags"></div>
+
+      <div id="resultsMeta" class="results-meta" aria-live="polite"></div>
+
+      <div id="cards" class="grid" aria-label="Experience cards"></div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="section__head">
+        <h2>About</h2>
+        <div class="section__sub">A short, honest summary — tweak freely.</div>
+      </div>
+
+      <div class="about">
+        <p>
+          I’m a builder who likes high‑agency environments: early-stage companies, ambitious teams, and messy problems that
+          need both creativity and rigor. In business, I’ve worked across strategy and commercialization with a focus on
+          food, biotech, and scaling “first‑of‑a‑kind” ideas. In creative work, I love craft, storytelling, and designing
+          systems people actually enjoy using.
+        </p>
+        <p class="muted">
+          Everything on this site is intentionally modular. Some experiences are lightweight. Others go deep (with sub‑projects).
+        </p>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="section__head">
+        <h2>Contact</h2>
+        <div class="section__sub">If you want to talk, here’s the fastest way.</div>
+      </div>
+
+      <div class="contact">
+        <a class="btn btn--primary" href="mailto:hello@eitandarwish.com">hello@eitandarwish.com</a>
+        <a class="btn btn--ghost" href="#" id="copyEmail" type="button">Copy email</a>
+        <a class="btn btn--ghost" href="https://www.linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal__top">
+        <div>
+          <div id="modalKicker" class="kicker"></div>
+          <h3 id="modalTitle"></h3>
+        </div>
+        <button id="modalClose" class="btn btn--ghost" type="button" aria-label="Close">✕</button>
+      </div>
+
+      <div id="modalTags" class="chips chips--dense"></div>
+      <div id="modalBody" class="modal__body"></div>
+
+      <div class="modal__bottom">
+        <a id="modalDeepDive" class="btn btn--primary" href="#" style="display:none;">Open deep dive</a>
+        <button id="modalDone" class="btn btn--ghost" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="container footer">
+    <div>© <span id="year"></span> Eitan Darwish</div>
+    <div class="muted">Built as a static site (S3‑friendly). Data-driven cards. Lightweight JS.</div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
