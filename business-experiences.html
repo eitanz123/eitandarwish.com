@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/styles.css"/>
 </head>
 
-<body data-lane="business" class="lanePage">
+<body data-lane="business" class="lanePage tilesPage tilesPage--business" data-tiles-root="tilesRoot">
   <div class="bg-noise" aria-hidden="true"></div>
 
   <!-- Match index header -->
@@ -25,65 +25,38 @@
       <a class="nav__link is-active" href="business-experiences.html">Business</a>
       <a class="nav__link" href="creative-experiences.html">Creative</a>
       <a class="nav__link" href="index.html#contact">Contact</a>
-      <button id="themeToggle" class="btn btn--ghost" type="button" title="Toggle theme" aria-label="Toggle theme">
-        <span class="icon">◐</span>
-      </button>
     </div>
   </header>
 
   <main class="landing__main">
-    <section class="laneHead">
-      <h1 class="laneTitle">Business</h1>
-      <p class="laneSub">Filter by tags. Click a card to open L / M / H detail.</p>
-    </section>
-
-    <section id="work" class="section section--tight">
-      <div class="filters">
-        <div class="filters__left">
-          <label class="field">
-            <span class="field__label">Search</span>
-            <input id="searchInput" class="input" type="search" placeholder="Try: McKinsey, Food-Tech, Private Equity…"/>
-          </label>
-
-          <label class="field">
-            <span class="field__label">Tag group</span>
-            <select id="tagGroupSelect" class="select">
-              <option value="__all__">All</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="filters__right">
-          <button id="clearFilters" class="btn btn--ghost" type="button">Clear filters</button>
-        </div>
-      </div>
-
-      <div id="tagChips" class="chips" aria-label="Tags"></div>
-      <div id="resultsMeta" class="results-meta" aria-live="polite"></div>
-      <div id="cards" class="grid" aria-label="Experience cards"></div>
-    </section>
-  </main>
-
-  <!-- Modal -->
-  <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal__top">
-        <div>
-          <div id="modalKicker" class="kicker"></div>
-          <h3 id="modalTitle"></h3>
-        </div>
-        <button id="modalClose" class="btn btn--ghost" type="button" aria-label="Close">✕</button>
-      </div>
-
-      <div id="modalTags" class="chips chips--dense"></div>
-      <div id="modalBody" class="modal__body"></div>
-
-      <div class="modal__bottom">
-        <a id="modalDeepDive" class="btn btn--primary" href="#" style="display:none;">Open deep dive</a>
-        <button id="modalDone" class="btn btn--ghost" type="button">Done</button>
+  <div class="tilesWrap">
+    <div class="tilesHeader">
+      <div>
+        <h1 class="tilesTitle">Business</h1>
+        <p class="tilesSub">Strategy, scaling, and commercialization work. Filter by tag or search.</p>
       </div>
     </div>
+
+    <div class="tilesFilters" aria-label="Filters">
+      <input
+        id="searchInput"
+        class="tilesSearch"
+        type="search"
+        placeholder="Search (e.g., McKinsey, Food Tech, diligence)…"
+        autocomplete="off"
+      />
+
+      <div class="tilesFilterRow">
+        <div id="tagChips" class="tagChips" aria-label="Tags"></div>
+        <button id="clearFilters" class="btn btn--ghost tilesClear" type="button">Clear</button>
+      </div>
+
+      <div id="resultsMeta" class="resultsMeta" aria-live="polite"></div>
+    </div>
+
+    <div id="tilesRoot"></div>
   </div>
+  </main>
 
   <!-- Match index footer -->
   <footer class="landing__footer">
@@ -97,6 +70,6 @@
     </div>
   </footer>
 
-  <script src="js/app.js"></script>
+  <script src="js/cms.js" defer></script>
 </body>
 </html>
