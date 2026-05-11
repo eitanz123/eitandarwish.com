@@ -1,86 +1,32 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Eitan Darwish</title>
-  <meta name="description" content="Business and Creative portfolio for Eitan Darwish."/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta name="description" content="Eitan Darwish's personal site is being rebuilt.">
+  <meta property="og:title" content="Eitan Darwish">
+  <meta property="og:description" content="Personal site reset in progress.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://eitandarwish.com/">
+  <link rel="stylesheet" href="css/styles.css">
 </head>
-<body class="landing landing--mock">
-  <div class="bg-noise" aria-hidden="true"></div>
-
-  <header class="landing__header">
-    <div class="landing__brand">
-      <div class="landing__name">Eitan Darwish</div>
-      <div class="landing__tagline">MBA Candidate, Class of 2027</div>
+<body>
+  <main class="placeholder" aria-labelledby="site-title">
+    <div class="site-shell">
+      <p class="eyebrow">Personal site reset</p>
+      <h1 id="site-title">Eitan Darwish</h1>
+      <p class="dek">
+        Stanford GSB MBA '27. Building 9ton, Foundry, and operating systems for messy real-world businesses.
+      </p>
+      <p class="note">
+        This site is intentionally quiet while the next version is rebuilt after the May 2026 agent seminar.
+      </p>
+      <nav class="links" aria-label="Contact links">
+        <a href="mailto:eitan@darwish.com">eitan@darwish.com</a>
+        <a href="https://www.linkedin.com/in/eitandarwish/" target="_blank" rel="noopener">LinkedIn</a>
+      </nav>
     </div>
-
-    <div class="landing__nav">
-      <a class="nav__link" href="business-experiences.html">Business</a>
-      <a class="nav__link" href="creative-experiences.html">Creative</a>
-      <a class="nav__link" href="#contact">Contact</a>
-    </div>
-  </header>
-
-
-  <section class="landingSplit" aria-label="Explore">
-  <a class="landingCard landingCard--business" href="business-experiences.html" aria-label="Business">
-    <div class="bizCard" aria-hidden="true">
-      <div class="bizCard__email">EITAN@DARWISH.COM</div>
-      <div class="bizCard__center">BUSINESS</div>
-    </div>
-  </a>
-
-  <a class="landingCard landingCard--creative" href="creative-experiences.html" aria-label="Creative">
-    <div class="pearlStone pearlStone--img" aria-hidden="true">
-      <img
-        class="pearlStone__img"
-        src="images/tiles/pearl-stone-1200-clean.png"
-        srcset="images/tiles/pearl-stone-1200-clean.png 1x, images/tiles/pearl-stone-2400-clean.png 2x"
-        width="600"
-        height="388"
-        alt=""
-      />
-      <div class="pearlStone__text">
-        <div class="pearlStone__title">CREATIVE</div>
-      </div>
-    </div>
-  </section>
-
-  <footer id="contact" class="landing__footer">
-    <div class="landing__footerInner">
-      <div class="muted">© <span id="year"></span> Eitan Darwish</div>
-      <div class="landingLinks">
-        <a class="nav__link" href="mailto:hello@eitandarwish.com">Email</a>
-        <a class="nav__link" target="_blank" rel="noopener" href="https://www.linkedin.com/">LinkedIn</a>
-        <a class="nav__link" href="data/Eitan_Darwish_Resume.pdf" target="_blank" rel="noopener">Resume</a>
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    function setTheme(t){
-      document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
-      localStorage.setItem("theme", t);
-    }
-    function loadTheme(){
-      const saved = localStorage.getItem("theme");
-      if (saved) setTheme(saved);
-      else {
-        const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
-        setTheme(prefersLight ? "light" : "dark");
-      }
-    }
-    loadTheme();
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+  </main>
 </body>
 </html>
