@@ -1,0 +1,80 @@
+name: Inspect portfolio path hosting
+
+on:
+  push:
+    branches: ["codex/599-build-portfolio"]
+    paths: [".github/workflows/inspect-portfolio-hosting.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Configure existing AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Read only the personal-domain CloudFront configuration
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, subprocess
+          
+          def aws(*arguments):
+              completed = subprocess.run(["aws", *arguments, "--output", "json"], capture_output=True, text=True)
+              if completed.returncode:
+                  print("AWS read-only request failed:", completed.stderr.strip())
+                  raise SystemExit(completed.returncode)
+              return json.loads(completed.stdout)
+          
+          data = aws("cloudfront", "list-distributions")
+          matches = [d for d in data.get("DistributionList", {}).get("Items", [])
+                     if "eitandarwish.com" in d.get("Aliases", {}).get("Items", [])]
+          if len(matches) != 1:
+              print(json.dumps({"matching_distribution_count": len(matches)}))
+              raise SystemExit("Expected exactly one distribution for eitandarwish.com")
+          distribution = matches[0]
+          result = aws("cloudfront", "get-distribution-config", "--id", distribution["Id"])
+          config = result["DistributionConfig"]
+          origins = []
+          for origin in config.get("Origins", {}).get("Items", []):
+              origins.append({
+                  "Id": origin["Id"],
+                  "DomainName": origin["DomainName"],
+                  "OriginPath": origin.get("OriginPath", ""),
+                  "CustomOriginConfig": origin.get("CustomOriginConfig"),
+                  "hasOriginAccessControl": bool(origin.get("OriginAccessControlId")),
+                  "hasS3OriginAccessIdentity": bool(origin.get("S3OriginConfig", {}).get("OriginAccessIdentity")),
+                  "CustomHeaderNames": [h["HeaderName"] for h in origin.get("CustomHeaders", {}).get("Items", [])]
+              })
+          behaviors = []
+          for behavior in [config.get("DefaultCacheBehavior", {})] + config.get("CacheBehaviors", {}).get("Items", []):
+              allowed = ["PathPattern", "TargetOriginId", "ViewerProtocolPolicy", "AllowedMethods", "CachePolicyId",
+                         "OriginRequestPolicyId", "ResponseHeadersPolicyId", "ForwardedValues", "MinTTL", "DefaultTTL",
+                         "MaxTTL", "Compress", "SmoothStreaming", "FieldLevelEncryptionId"]
+              item = {key: behavior[key] for key in allowed if key in behavior}
+              item["isDefault"] = "PathPattern" not in behavior
+              item["FunctionAssociations"] = [
+                  {"EventType": a.get("EventType"), "FunctionName": a.get("FunctionARN", "").rsplit("/", 1)[-1]}
+                  for a in behavior.get("FunctionAssociations", {}).get("Items", [])]
+              item["LambdaFunctionAssociations"] = [
+                  {"EventType": a.get("EventType"), "hasLambdaFunction": bool(a.get("LambdaFunctionARN"))}
+                  for a in behavior.get("LambdaFunctionAssociations", {}).get("Items", [])]
+              behaviors.append(item)
+          print(json.dumps({
+              "Id": distribution["Id"], "Status": distribution["Status"], "DomainName": distribution["DomainName"],
+              "Aliases": config.get("Aliases", {}), "ETag": result["ETag"], "Enabled": config["Enabled"],
+              "DefaultRootObject": config.get("DefaultRootObject", ""), "Origins": origins,
+              "Behaviors": behaviors, "CustomErrorResponses": config.get("CustomErrorResponses", {}),
+              "hasWebACL": bool(config.get("WebACLId")), "HttpVersion": config.get("HttpVersion"),
+              "IsIPV6Enabled": config.get("IsIPV6Enabled"), "PriceClass": config.get("PriceClass")
+          }, indent=2))
+          PY
