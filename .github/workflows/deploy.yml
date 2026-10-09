@@ -4,6 +4,9 @@ on:
   push:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -11,12 +14,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify encrypted portfolio files are present
+        run: |
+          test -s 599-build-portfolio/index.html
+          test -s 599-build-portfolio/payload.bin
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+          mask-aws-account-id: true
 
       - name: Sync site to S3
         run: |
@@ -26,3 +35,32 @@ jobs:
             --exclude "_revamp_backups/*" \
             --exclude ".venv/*" \
             --exclude "backup/*"
+
+      - name: Publish the protected portfolio path and encrypted payload
+        env:
+          PORTFOLIO_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          aws s3api put-object \
+            --bucket "$PORTFOLIO_BUCKET" \
+            --key "599-build-portfolio" \
+            --body "599-build-portfolio/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-store" \
+            --no-cli-pager > /dev/null
+          aws s3api put-object \
+            --bucket "$PORTFOLIO_BUCKET" \
+            --key "599-build-portfolio/" \
+            --body "599-build-portfolio/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-store" \
+            --no-cli-pager > /dev/null
+          aws s3 cp "599-build-portfolio/index.html" \
+            "s3://$PORTFOLIO_BUCKET/599-build-portfolio/index.html" \
+            --content-type "text/html; charset=utf-8" \
+            --cache-control "no-store" \
+            --only-show-errors
+          aws s3 cp "599-build-portfolio/payload.bin" \
+            "s3://$PORTFOLIO_BUCKET/599-build-portfolio/payload.bin" \
+            --content-type "application/octet-stream" \
+            --cache-control "no-store" \
+            --only-show-errors
