@@ -4,29 +4,52 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Eitan Darwish</title>
-  <meta name="description" content="Eitan Darwish's personal site is being rebuilt.">
+  <meta name="description" content="Contact Eitan Darwish or explore 9ton Foundry.">
   <meta property="og:title" content="Eitan Darwish">
-  <meta property="og:description" content="Personal site reset in progress.">
+  <meta property="og:description" content="Contact Eitan Darwish or explore 9ton Foundry.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://eitandarwish.com/">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f6f5f0;
+      color: #172028;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    main {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 32px 24px;
+    }
+    nav { display: flex; flex-direction: column; gap: 16px; }
+    a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      color: #172028;
+      font-size: 22px;
+      line-height: 1.4;
+      text-decoration: underline;
+      text-decoration-color: #294ad9;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 6px;
+    }
+    a:hover { color: #294ad9; }
+    a:focus-visible { outline: 2px solid #294ad9; outline-offset: 8px; }
+  </style>
 </head>
 <body>
-  <main class="placeholder" aria-labelledby="site-title">
-    <div class="site-shell">
-      <p class="eyebrow">Personal site reset</p>
-      <h1 id="site-title">Eitan Darwish</h1>
-      <p class="dek">
-        Stanford GSB MBA '27. Building AI operating systems for messy real-world businesses and humans.
-      </p>
-      <p class="note">
-        This site is intentionally quiet while the next version is rebuilt after the May 2026 <a href="https://foundry.9ton.io" target="_blank" rel="noopener">agent seminar</a>.
-      </p>
-      <nav class="links" aria-label="Contact links">
-        <a href="mailto:edarwish@stanford.edu">edarwish@stanford.edu</a>
-        <a href="https://www.linkedin.com/in/eitandarwish/" target="_blank" rel="noopener">LinkedIn</a>
-      </nav>
-    </div>
+  <main>
+    <nav aria-label="Eitan Darwish links">
+      <a href="mailto:edarwish@stanford.edu">edarwish@stanford.edu</a>
+      <a href="https://www.linkedin.com/in/eitandarwish/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://foundry.9ton.io" target="_blank" rel="noopener">9ton Foundry</a>
+    </nav>
   </main>
 </body>
 </html>
