@@ -18,6 +18,9 @@ jobs:
         run: |
           test -s 599-build-portfolio/index.html
           test -s 599-build-portfolio/payload.bin
+          test -s llmh-build-portfolio/index.html
+          test -s llmh-build-portfolio/payload.bin
+          test -s llmh-build-portfolio/philosophy/index.html
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -68,3 +71,21 @@ jobs:
             --content-type "application/octet-stream" \
             --cache-control "no-store" \
             --only-show-errors
+
+      - name: Publish the protected Long Lake portfolio and philosophy routes
+        env:
+          PORTFOLIO_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          for route in llmh-build-portfolio llmh-build-portfolio/philosophy; do
+            for key in "$route" "$route/" "$route/index.html"; do
+              aws s3api put-object \
+                --bucket "$PORTFOLIO_BUCKET" --key "$key" \
+                --body "$route/index.html" \
+                --content-type "text/html; charset=utf-8" \
+                --cache-control "no-store" --no-cli-pager > /dev/null
+            done
+          done
+          aws s3 cp "llmh-build-portfolio/payload.bin" \
+            "s3://$PORTFOLIO_BUCKET/llmh-build-portfolio/payload.bin" \
+            --content-type "application/octet-stream" \
+            --cache-control "no-store" --only-show-errors
