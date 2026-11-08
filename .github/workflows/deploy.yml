@@ -21,6 +21,9 @@ jobs:
           test -s llmh-build-portfolio/index.html
           test -s llmh-build-portfolio/payload.bin
           test -s llmh-build-portfolio/philosophy/index.html
+          test -s ascentio-build-portfolio/index.html
+          test -s ascentio-build-portfolio/payload.bin
+          test -s ascentio-build-portfolio/philosophy/index.html
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -87,5 +90,23 @@ jobs:
           done
           aws s3 cp "llmh-build-portfolio/payload.bin" \
             "s3://$PORTFOLIO_BUCKET/llmh-build-portfolio/payload.bin" \
+            --content-type "application/octet-stream" \
+            --cache-control "no-store" --only-show-errors
+
+      - name: Publish the protected Ascentio portfolio and philosophy routes
+        env:
+          PORTFOLIO_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          for route in ascentio-build-portfolio ascentio-build-portfolio/philosophy; do
+            for key in "$route" "$route/" "$route/index.html"; do
+              aws s3api put-object \
+                --bucket "$PORTFOLIO_BUCKET" --key "$key" \
+                --body "$route/index.html" \
+                --content-type "text/html; charset=utf-8" \
+                --cache-control "no-store" --no-cli-pager > /dev/null
+            done
+          done
+          aws s3 cp "ascentio-build-portfolio/payload.bin" \
+            "s3://$PORTFOLIO_BUCKET/ascentio-build-portfolio/payload.bin" \
             --content-type "application/octet-stream" \
             --cache-control "no-store" --only-show-errors
